@@ -10,13 +10,40 @@ import (
 	models "todolist/models"
 )
 
+func Bajarilgan_amallar(soz string) {
+	file3, err := os.OpenFile("/home/abduazim/Projects/Golang/todolist/bajarilgan_amallar.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file3.Close()
+
+	yozuvchi := bufio.NewWriter(file3)
+	fmt.Fprintln(yozuvchi, soz)
+	yozuvchi.Flush()
+
+}
+
+func Bajarilmagan_amallar(soz string) {
+	file4, err := os.OpenFile("/home/abduazim/Projects/Golang/todolist/bajarilmagan_amallar.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file4.Close()
+
+	yozuvchi := bufio.NewWriter(file4)
+	fmt.Fprintln(yozuvchi, soz)
+	yozuvchi.Flush()
+}
+
 func Amallar(user models.Users) {
 	var (
-		son       int
+		son int
 	)
 
 	current := time.Now()
-	file, err := os.OpenFile("/home/abduazim/Projects/Golang/todolist/users.txt",os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	file, err := os.OpenFile("/home/abduazim/Projects/Golang/todolist/users.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -25,6 +52,10 @@ func Amallar(user models.Users) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if !strings.Contains(line, user.Surname) && !strings.Contains(line, user.Name) {
+			soz := user.Name + user.Surname
+			yozuvchi := bufio.NewWriter(file)
+			fmt.Fprintln(yozuvchi, soz)
+			yozuvchi.Flush()
 			fmt.Println("Siz yangi user siz sizda amallar yoq!!!!!!!!!!!!")
 			return
 		}
@@ -35,20 +66,6 @@ func Amallar(user models.Users) {
 		log.Fatal(err)
 	}
 	defer file2.Close()
-
-	file3, err := os.OpenFile("/home/abduazim/Projects/Golang/todolist/bajarilgan_amallar.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file3.Close()
-
-	file4, err := os.OpenFile("/home/abduazim/Projects/Golang/todolist/bajarilmagan_amallar.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file4.Close()
 	scanner2 := bufio.NewScanner(file2)
 	for scanner2.Scan() {
 		line := scanner2.Text()
@@ -62,29 +79,25 @@ func Amallar(user models.Users) {
 			}
 			fmt.Println("salom")
 			if current.Before(tm2) {
-				rs:=res[0] + "\n" + res[1]
-				yozuvchi:=bufio.NewWriter(file3)
-				fmt.Fprintln(yozuvchi,rs)
-				yozuvchi.Flush()
+				rs := res[0] + "\n" + res[1]
+
+				Bajarilgan_amallar(rs)
 			} else {
-				rs:=res[0] + "\n" + res[1]
-				yozuvchi:=bufio.NewWriter(file4)
-				fmt.Fprintln(yozuvchi,rs)
-				yozuvchi.Flush()
+				rs := res[0] + "\n" + res[1]
+				Bajarilmagan_amallar(rs)
 			}
 		}
-
 	}
 
 	fmt.Println("[1]Bajarilgan amallar\t[2]Bajarilmagan amallar")
 	fmt.Scanln(&son)
 	switch son {
 	case 1:
-		// file3, err := os.Open("/home/abduazim/Projects/Golang/todolist/bajarilgan_amallar.txt")
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		// defer file3.Close()
+		file3, err := os.Open("/home/abduazim/Projects/Golang/todolist/bajarilgan_amallar.txt")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file3.Close()
 
 		scanner := bufio.NewScanner(file3)
 		fmt.Println("Bajarilgan amallar")
@@ -93,16 +106,16 @@ func Amallar(user models.Users) {
 			fmt.Println(line)
 		}
 	case 2:
-		// file4, err := os.OpenFile("/home/abduazim/Projects/Golang/todolist/bajarilmagan_amallar.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		// defer file4.Close()
+		file4, err := os.OpenFile("/home/abduazim/Projects/Golang/todolist/bajarilmagan_amallar.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file4.Close()
 
-		scanner:=bufio.NewScanner(file4)
+		scanner := bufio.NewScanner(file4)
 		fmt.Println("Bajarilmagan amallar")
-		for scanner.Scan(){
-			line:=scanner.Text()
+		for scanner.Scan() {
+			line := scanner.Text()
 			fmt.Println(line)
 		}
 	}

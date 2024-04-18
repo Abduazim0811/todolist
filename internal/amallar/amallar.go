@@ -61,7 +61,7 @@ func Amallar(user models.Users) {
 		}
 	}
 
-	file2, err := os.OpenFile("/home/abduazim/Projects/Golang/todolist/amallar.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	file2, err := os.Open("/home/abduazim/Projects/Golang/todolist/amallar.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -69,18 +69,25 @@ func Amallar(user models.Users) {
 	scanner2 := bufio.NewScanner(file2)
 	for scanner2.Scan() {
 		line := scanner2.Text()
-		fmt.Println(line)
+		// fmt.Println(line)
 		if strings.Contains(line, "Amal vaqti:") {
 			res := strings.Split(line, ",")
+			if len(res) < 2 {
+				fmt.Println("Invalid line format:", line)
+				continue
+			}
 			res2 := strings.Split(res[0], "Amallar vaqti:")
+			if len(res2) < 2 {
+				fmt.Println("Invalid line format:", line)
+				continue
+			}
 			tm2, err := time.Parse("2006-01-02 08:00:00", res2[1])
 			if err != nil {
-				fmt.Println("Sana va vaqtni o'qishda xatolik bor: ", err)
+				fmt.Println("Error parsing time:", err)
 			}
 			fmt.Println("salom")
 			if current.Before(tm2) {
 				rs := res[0] + "\n" + res[1]
-
 				Bajarilgan_amallar(rs)
 			} else {
 				rs := res[0] + "\n" + res[1]
@@ -88,12 +95,15 @@ func Amallar(user models.Users) {
 			}
 		}
 	}
+	if err := scanner2.Err(); err != nil {
+		log.Fatal("Error reading file:", err)
+	}
 
 	fmt.Println("[1]Bajarilgan amallar\t[2]Bajarilmagan amallar")
 	fmt.Scanln(&son)
 	switch son {
 	case 1:
-		file3, err := os.Open("/home/abduazim/Projects/Golang/todolist/bajarilgan_amallar.txt")
+		file3, err := os.OpenFile("/home/abduazim/Projects/Golang/todolist/bajarilgan_amallar.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
 			log.Fatal(err)
 		}
